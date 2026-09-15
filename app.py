@@ -82,8 +82,23 @@ def load_model(crop):
         return None, f"Model file not found: {model_file.name}"
 
     try:
-        model = joblib.load(model_file)
+        loaded = joblib.load(model_file)
+
+        if isinstance(loaded, dict):
+            if "model" in loaded:
+                model = loaded["model"]
+            elif "classifier" in loaded:
+                model = loaded["classifier"]
+            elif "clf" in loaded:
+                model = loaded["clf"]
+            else:
+                return None, "The model file contains a dictionary, but no classifier was found."
+
+        else:
+            model = loaded
+
         return model, None
+
     except Exception as e:
         return None, str(e)
 
